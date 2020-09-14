@@ -1,9 +1,7 @@
-import "reflect-metadata";
 import "dotenv-safe/config";
-
-import typeormConnection from "./typeormConnection";
-import { User } from "./entities/User";
+import "reflect-metadata";
 import app from "./app";
+import typeormConnection from "./typeormConnection";
 
 const main = async () => {
   const conn = await typeormConnection();

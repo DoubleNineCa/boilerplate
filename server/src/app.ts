@@ -1,7 +1,7 @@
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import buildGraphqlSchema from "./utils/buildGraphqlSchema";
-import redis from "redis";
+import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { __prod__ } from "./constants";
@@ -10,10 +10,11 @@ import cors from "cors";
 const app = express();
 
 let RedisStore = connectRedis(session);
-let redisClient = redis.createClient();
+let redis = new Redis(process.env.REDIS_URL);
+app.set("trust proxy", 1);
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.APP_URL,
     credentials: true
   })
 );
@@ -21,7 +22,7 @@ app.use(
   session({
     name: "qid",
     store: new RedisStore({
-      client: redisClient,
+      client: redis,
       disableTouch: true
     }),
     cookie: {
@@ -31,7 +32,7 @@ app.use(
       sameSite: "lax" // csrf
     },
     saveUninitialized: false,
-    secret: "aosidjfojzxcvoijxcovijije",
+    secret: process.env.SESSION_SECRET,
     resave: false
   })
 );
